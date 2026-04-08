@@ -1,0 +1,176 @@
+/*
+ * Copyright (c) 2026 SoftwarEnTalla
+ * Licencia: MIT
+ * Contacto: softwarentalla@gmail.com
+ * CEOs: 
+ *       Persy Morell Guerra      Email: pmorellpersi@gmail.com  Phone : +53-5336-4654 Linkedin: https://www.linkedin.com/in/persy-morell-guerra-288943357/
+ *       Dailyn García Domínguez  Email: dailyngd@gmail.com      Phone : +53-5432-0312 Linkedin: https://www.linkedin.com/in/dailyn-dominguez-3150799b/
+ *
+ * CTO: Persy Morell Guerra
+ * COO: Dailyn García Domínguez and Persy Morell Guerra
+ * CFO: Dailyn García Domínguez and Persy Morell Guerra
+ *
+ * Repositories: 
+ *               https://github.com/SoftwareEnTalla 
+ *
+ *               https://github.com/apokaliptolesamale?tab=repositories
+ *
+ *
+ * Social Networks:
+ *
+ *              https://x.com/SoftwarEnTalla
+ *
+ *              https://www.facebook.com/profile.php?id=61572625716568
+ *
+ *              https://www.instagram.com/softwarentalla/
+ *              
+ *
+ *
+ */
+
+import { Column, Entity, OneToOne, JoinColumn, ChildEntity, ManyToOne, OneToMany, ManyToMany, JoinTable, Index, Check, Unique } from 'typeorm';
+import { BaseEntity } from './base.entity';
+import { CreateCustomerDto, UpdateCustomerDto, DeleteCustomerDto } from '../dtos/all-dto';
+import { IsBoolean, IsDate, IsInt, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, IsUUID } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { Field, Float, Int, ObjectType } from "@nestjs/graphql";
+import { plainToInstance } from 'class-transformer';
+
+
+@Index('idx_customer_user_id', ['userId'], { unique: true })
+@Unique('uq_customer_user_id', ['userId'])
+@ChildEntity('customer')
+@ObjectType()
+export class Customer extends BaseEntity {
+  @ApiProperty({
+    type: String,
+    nullable: false,
+    description: "Nombre de la instancia de Customer",
+  })
+  @IsString()
+  @IsNotEmpty()
+  @Field(() => String, { description: "Nombre de la instancia de Customer", nullable: false })
+  @Column({ type: 'varchar', length: 100, nullable: false, comment: 'Este es un campo para nombrar la instancia Customer' })
+  private name!: string;
+
+  @ApiProperty({
+    type: String,
+    description: "Descripción de la instancia de Customer",
+  })
+  @IsString()
+  @IsNotEmpty()
+  @Field(() => String, { description: "Descripción de la instancia de Customer", nullable: false })
+  @Column({ type: 'varchar', length: 255, nullable: false, default: "Sin descripción", comment: 'Este es un campo para describir la instancia Customer' })
+  private description!: string;
+
+  @ApiProperty({
+    type: () => String,
+    nullable: false,
+    description: 'Referencia canónica al user del microservicio security',
+  })
+  @IsUUID()
+  @IsNotEmpty()
+  @Field(() => String, { description: 'Referencia canónica al user del microservicio security', nullable: false })
+  @Column({ type: 'uuid', nullable: false, unique: true, comment: 'Referencia canónica al user del microservicio security' })
+  userId!: string;
+
+  @ApiProperty({
+    type: () => String,
+    nullable: false,
+    description: 'Nivel de riesgo del cliente',
+  })
+  @IsString()
+  @IsNotEmpty()
+  @Field(() => String, { description: 'Nivel de riesgo del cliente', nullable: false })
+  @Column({ type: 'varchar', nullable: false, length: 255, default: 'LOW', comment: 'Nivel de riesgo del cliente' })
+  riskLevel!: string;
+
+  @ApiProperty({
+    type: () => String,
+    nullable: true,
+    description: 'Referencia externa del cliente',
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, { description: 'Referencia externa del cliente', nullable: true })
+  @Column({ type: 'varchar', nullable: true, length: 120, comment: 'Referencia externa del cliente' })
+  externalReference?: string = '';
+
+  @ApiProperty({
+    type: () => Object,
+    nullable: true,
+    description: 'Medios de pago del cliente',
+  })
+  @IsObject()
+  @IsOptional()
+  @Field(() => String, { description: 'Medios de pago del cliente', nullable: true })
+  @Column({ type: 'json', nullable: true, comment: 'Medios de pago del cliente' })
+  paymentMethods?: Record<string, any> = {};
+
+  @ApiProperty({
+    type: () => Object,
+    nullable: true,
+    description: 'Metadatos del cliente',
+  })
+  @IsObject()
+  @IsOptional()
+  @Field(() => String, { description: 'Metadatos del cliente', nullable: true })
+  @Column({ type: 'json', nullable: true, comment: 'Metadatos del cliente' })
+  metadata?: Record<string, any> = {};
+
+  protected executeDslLifecycle(): void {
+    // Rule: customer-must-reference-user
+    // Todo customer debe mantener referencia a un user canónico en security.
+    if (!(!(this.userId === undefined || this.userId === null || (typeof this.userId === 'string' && String(this.userId).trim() === '') || (Array.isArray(this.userId) && this.userId.length === 0) || (typeof this.userId === 'object' && !Array.isArray(this.userId) && Object.keys((this.userId ?? {}) as Record<string, unknown>).length === 0)))) {
+      throw new Error('CUSTOMER_001: Todo customer debe referenciar un user canónico');
+    }
+  }
+
+  // Relación con BaseEntity (opcional, si aplica)
+  // @OneToOne(() => BaseEntity, { cascade: true })
+  // @JoinColumn()
+  // base!: BaseEntity;
+
+  constructor() {
+    super();
+    this.type = 'customer';
+  }
+
+  // Getters y Setters
+  get getName(): string {
+    return this.name;
+  }
+  set setName(value: string) {
+    this.name = value;
+  }
+  get getDescription(): string {
+    return this.description;
+  }
+
+  // Métodos abstractos implementados
+  async create(data: any): Promise<BaseEntity> {
+    Object.assign(this, data);
+    this.executeDslLifecycle();
+    this.modificationDate = new Date();
+    return this;
+  }
+  async update(data: any): Promise<BaseEntity> {
+    Object.assign(this, data);
+    this.executeDslLifecycle();
+    this.modificationDate = new Date();
+    return this;
+  }
+  async delete(id: string): Promise<BaseEntity> {
+    this.id = id;
+    return this;
+  }
+
+  // Método estático para convertir DTOs a entidad con sobrecarga
+  static fromDto(dto: CreateCustomerDto): Customer;
+  static fromDto(dto: UpdateCustomerDto): Customer;
+  static fromDto(dto: DeleteCustomerDto): Customer;
+  static fromDto(dto: any): Customer {
+    // plainToInstance soporta todos los DTOs
+    return plainToInstance(Customer, dto);
+  }
+}

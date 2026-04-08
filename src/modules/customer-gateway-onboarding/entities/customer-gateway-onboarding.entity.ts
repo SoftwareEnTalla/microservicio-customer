@@ -226,10 +226,6 @@ export class CustomerGatewayOnboarding extends BaseEntity {
     if (!(this.status === 'APPROVED' && !(this.completedAt === undefined || this.completedAt === null || (typeof this.completedAt === 'string' && String(this.completedAt).trim() === '') || (Array.isArray(this.completedAt) && this.completedAt.length === 0) || (typeof this.completedAt === 'object' && !Array.isArray(this.completedAt) && Object.prototype.toString.call(this.completedAt) === '[object Object]' && Object.keys(Object(this.completedAt)).length === 0)))) {
       console.warn('CUST_ONBOARDING_001: Un onboarding aprobado debe tener fecha de finalización');
     }
-
-    // Rule: rejected-onboarding-emits-domain-event
-    // Cuando un onboarding sea rechazado debe emitirse un evento de dominio.
-    // TODO DSL emit-event: customer-gateway-onboarding-rejected
   }
 
   // Relación con BaseEntity (opcional, si aplica)

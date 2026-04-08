@@ -121,7 +121,7 @@ export class Customer extends BaseEntity {
   protected executeDslLifecycle(): void {
     // Rule: customer-must-reference-user
     // Todo customer debe mantener referencia a un user canónico en security.
-    if (!(!(this.userId === undefined || this.userId === null || (typeof this.userId === 'string' && String(this.userId).trim() === '') || (Array.isArray(this.userId) && this.userId.length === 0) || (typeof this.userId === 'object' && !Array.isArray(this.userId) && Object.keys((this.userId ?? {}) as Record<string, unknown>).length === 0)))) {
+    if (!(!(this.userId === undefined || this.userId === null || (typeof this.userId === 'string' && String(this.userId).trim() === '') || (Array.isArray(this.userId) && this.userId.length === 0) || (typeof this.userId === 'object' && !Array.isArray(this.userId) && Object.prototype.toString.call(this.userId) === '[object Object]' && Object.keys(Object(this.userId)).length === 0)))) {
       throw new Error('CUSTOMER_001: Todo customer debe referenciar un user canónico');
     }
   }

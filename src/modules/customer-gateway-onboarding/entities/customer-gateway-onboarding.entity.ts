@@ -223,7 +223,7 @@ export class CustomerGatewayOnboarding extends BaseEntity {
   protected executeDslLifecycle(): void {
     // Rule: approved-onboarding-requires-completion-date
     // Un onboarding aprobado debe registrar fecha de finalización.
-    if (!(this.status === 'APPROVED' && !(this.completedAt === undefined || this.completedAt === null || (typeof this.completedAt === 'string' && String(this.completedAt).trim() === '') || (Array.isArray(this.completedAt) && this.completedAt.length === 0) || (typeof this.completedAt === 'object' && !Array.isArray(this.completedAt) && Object.keys((this.completedAt ?? {}) as Record<string, unknown>).length === 0)))) {
+    if (!(this.status === 'APPROVED' && !(this.completedAt === undefined || this.completedAt === null || (typeof this.completedAt === 'string' && String(this.completedAt).trim() === '') || (Array.isArray(this.completedAt) && this.completedAt.length === 0) || (typeof this.completedAt === 'object' && !Array.isArray(this.completedAt) && Object.prototype.toString.call(this.completedAt) === '[object Object]' && Object.keys(Object(this.completedAt)).length === 0)))) {
       console.warn('CUST_ONBOARDING_001: Un onboarding aprobado debe tener fecha de finalización');
     }
 

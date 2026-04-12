@@ -1,19 +1,8 @@
 # CUSTOMER Microservice
 
-**Creation Date**: 2026-04-11
+**Creation Date**: 2026-04-12
 
 **Author**: Ing. Persy Morell Guerra e Ing. Dailyn García Dominguez (SoftwarEnTalla CEO)
-
-## Contexto funcional reciente
-
-`customer-service` actúa como owner del ciclo de onboarding por pasarela a través de `customer-gateway-onboarding`.
-
-Eventos publicados:
-
-- `CustomerGatewayOnboardingStarted`
-- `CustomerGatewayOnboardingApproved`
-- `CustomerGatewayOnboardingRejected`
-- `CustomerGatewayOnboardingExpired`
 
 ## Microservice Structure
 

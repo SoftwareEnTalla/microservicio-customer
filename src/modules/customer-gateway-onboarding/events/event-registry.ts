@@ -33,7 +33,10 @@ import { BaseEvent } from './base.event';
 import { CustomerGatewayOnboardingCreatedEvent } from './customergatewayonboardingcreated.event';
 import { CustomerGatewayOnboardingUpdatedEvent } from './customergatewayonboardingupdated.event';
 import { CustomerGatewayOnboardingDeletedEvent } from './customergatewayonboardingdeleted.event';
+import { CustomerGatewayOnboardingStartedEvent } from './customergatewayonboardingstarted.event';
+import { CustomerGatewayOnboardingApprovedEvent } from './customergatewayonboardingapproved.event';
 import { CustomerGatewayOnboardingRejectedEvent } from './customergatewayonboardingrejected.event';
+import { CustomerGatewayOnboardingExpiredEvent } from './customergatewayonboardingexpired.event';
 
 export type RegisteredEventClass<T extends BaseEvent = BaseEvent> = new (
   aggregateId: string,
@@ -74,7 +77,10 @@ export const EVENT_DEFINITIONS: Record<string, RegisteredEventDefinition> = {
   'customer-gateway-onboarding-created': createEventDefinition('customer-gateway-onboarding-created', CustomerGatewayOnboardingCreatedEvent, EVENT_DEFINITION_OVERRIDES['customer-gateway-onboarding-created']),
   'customer-gateway-onboarding-updated': createEventDefinition('customer-gateway-onboarding-updated', CustomerGatewayOnboardingUpdatedEvent, EVENT_DEFINITION_OVERRIDES['customer-gateway-onboarding-updated']),
   'customer-gateway-onboarding-deleted': createEventDefinition('customer-gateway-onboarding-deleted', CustomerGatewayOnboardingDeletedEvent, EVENT_DEFINITION_OVERRIDES['customer-gateway-onboarding-deleted']),
+  'customer-gateway-onboarding-started': createEventDefinition('customer-gateway-onboarding-started', CustomerGatewayOnboardingStartedEvent, EVENT_DEFINITION_OVERRIDES['customer-gateway-onboarding-started']),
+  'customer-gateway-onboarding-approved': createEventDefinition('customer-gateway-onboarding-approved', CustomerGatewayOnboardingApprovedEvent, EVENT_DEFINITION_OVERRIDES['customer-gateway-onboarding-approved']),
   'customer-gateway-onboarding-rejected': createEventDefinition('customer-gateway-onboarding-rejected', CustomerGatewayOnboardingRejectedEvent, EVENT_DEFINITION_OVERRIDES['customer-gateway-onboarding-rejected']),
+  'customer-gateway-onboarding-expired': createEventDefinition('customer-gateway-onboarding-expired', CustomerGatewayOnboardingExpiredEvent, EVENT_DEFINITION_OVERRIDES['customer-gateway-onboarding-expired']),
 };
 
 export const EVENT_REGISTRY: Record<string, RegisteredEventClass> = Object.fromEntries(

@@ -51,7 +51,10 @@ import { KafkaEventPublisher } from "../shared/adapters/kafka-event-publisher";
 import { ModuleRef } from "@nestjs/core";
 import { CustomerGatewayOnboardingQueryService } from "./customergatewayonboardingquery.service";
 import { BaseEvent } from "../events/base.event";
+import { CustomerGatewayOnboardingStartedEvent } from '../events/customergatewayonboardingstarted.event';
+import { CustomerGatewayOnboardingApprovedEvent } from '../events/customergatewayonboardingapproved.event';
 import { CustomerGatewayOnboardingRejectedEvent } from '../events/customergatewayonboardingrejected.event';
+import { CustomerGatewayOnboardingExpiredEvent } from '../events/customergatewayonboardingexpired.event';
 
 @Injectable()
 export class CustomerGatewayOnboardingCommandService implements OnModuleInit {
@@ -122,10 +125,43 @@ export class CustomerGatewayOnboardingCommandService implements OnModuleInit {
         logger.warn('CUST_ONBOARDING_001: Un onboarding aprobado debe tener fecha de finalización');
       }
 
+      // Regla de servicio: started-onboarding-emits-domain-event
+      // Cuando un onboarding entra en progreso debe emitirse un evento para que payment pueda pausar el checkout y esperar acción del cliente.
+      if (this.dslValue(entityData, currentData, inputData, 'status') === 'IN_PROGRESS') {
+        pendingEvents.push(CustomerGatewayOnboardingStartedEvent.create(
+          String(entityData['id'] ?? currentData['id'] ?? inputData?.id ?? 'customer-gateway-onboarding-update'),
+          (entity ?? current ?? inputData ?? {}) as any,
+          String(entityData['createdBy'] ?? currentData['createdBy'] ?? inputData?.createdBy ?? 'system'),
+          String(entityData['id'] ?? currentData['id'] ?? inputData?.id ?? 'customer-gateway-onboarding-update')
+        ));
+      }
+
+      // Regla de servicio: approved-onboarding-emits-domain-event
+      // Cuando un onboarding sea aprobado debe emitirse un evento para reanudar el flujo de pago.
+      if (this.dslValue(entityData, currentData, inputData, 'status') === 'APPROVED') {
+        pendingEvents.push(CustomerGatewayOnboardingApprovedEvent.create(
+          String(entityData['id'] ?? currentData['id'] ?? inputData?.id ?? 'customer-gateway-onboarding-update'),
+          (entity ?? current ?? inputData ?? {}) as any,
+          String(entityData['createdBy'] ?? currentData['createdBy'] ?? inputData?.createdBy ?? 'system'),
+          String(entityData['id'] ?? currentData['id'] ?? inputData?.id ?? 'customer-gateway-onboarding-update')
+        ));
+      }
+
       // Regla de servicio: rejected-onboarding-emits-domain-event
       // Cuando un onboarding sea rechazado debe emitirse un evento de dominio.
       if (this.dslValue(entityData, currentData, inputData, 'status') === 'REJECTED') {
         pendingEvents.push(CustomerGatewayOnboardingRejectedEvent.create(
+          String(entityData['id'] ?? currentData['id'] ?? inputData?.id ?? 'customer-gateway-onboarding-update'),
+          (entity ?? current ?? inputData ?? {}) as any,
+          String(entityData['createdBy'] ?? currentData['createdBy'] ?? inputData?.createdBy ?? 'system'),
+          String(entityData['id'] ?? currentData['id'] ?? inputData?.id ?? 'customer-gateway-onboarding-update')
+        ));
+      }
+
+      // Regla de servicio: expired-onboarding-emits-domain-event
+      // Cuando un onboarding expira debe emitirse un evento para cerrar pagos dependientes del flujo.
+      if (this.dslValue(entityData, currentData, inputData, 'status') === 'EXPIRED') {
+        pendingEvents.push(CustomerGatewayOnboardingExpiredEvent.create(
           String(entityData['id'] ?? currentData['id'] ?? inputData?.id ?? 'customer-gateway-onboarding-update'),
           (entity ?? current ?? inputData ?? {}) as any,
           String(entityData['createdBy'] ?? currentData['createdBy'] ?? inputData?.createdBy ?? 'system'),

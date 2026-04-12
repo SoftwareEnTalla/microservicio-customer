@@ -53,7 +53,10 @@ import { IEventHandler, EventsHandler } from '@nestjs/cqrs';
 import { CustomerGatewayOnboardingCreatedEvent } from '../events/customergatewayonboardingcreated.event';
 import { CustomerGatewayOnboardingUpdatedEvent } from '../events/customergatewayonboardingupdated.event';
 import { CustomerGatewayOnboardingDeletedEvent } from '../events/customergatewayonboardingdeleted.event';
+import { CustomerGatewayOnboardingStartedEvent } from "../events/customergatewayonboardingstarted.event";
+import { CustomerGatewayOnboardingApprovedEvent } from "../events/customergatewayonboardingapproved.event";
 import { CustomerGatewayOnboardingRejectedEvent } from "../events/customergatewayonboardingrejected.event";
+import { CustomerGatewayOnboardingExpiredEvent } from "../events/customergatewayonboardingexpired.event";
 
 //Enfoque Event Sourcing
 import { CommandBus } from '@nestjs/cqrs';
@@ -66,7 +69,7 @@ import { EventSourcingHelper } from '../shared/decorators/event-sourcing.helper'
 import { EventSourcingConfigOptions } from '../shared/decorators/event-sourcing.decorator';
 
 
-@EventsHandler(CustomerGatewayOnboardingCreatedEvent, CustomerGatewayOnboardingUpdatedEvent, CustomerGatewayOnboardingDeletedEvent, CustomerGatewayOnboardingRejectedEvent)
+@EventsHandler(CustomerGatewayOnboardingCreatedEvent, CustomerGatewayOnboardingUpdatedEvent, CustomerGatewayOnboardingDeletedEvent, CustomerGatewayOnboardingStartedEvent, CustomerGatewayOnboardingApprovedEvent, CustomerGatewayOnboardingRejectedEvent, CustomerGatewayOnboardingExpiredEvent)
 @Injectable()
 export class CustomerGatewayOnboardingCommandRepository implements IEventHandler<BaseEvent>{
 
@@ -157,8 +160,14 @@ export class CustomerGatewayOnboardingCommandRepository implements IEventHandler
         return await this.onCustomerGatewayOnboardingUpdated(event);
       case 'CustomerGatewayOnboardingDeletedEvent':
         return await this.onCustomerGatewayOnboardingDeleted(event);
+      case 'CustomerGatewayOnboardingStartedEvent':
+        return await this.onCustomerGatewayOnboardingStarted(event);
+      case 'CustomerGatewayOnboardingApprovedEvent':
+        return await this.onCustomerGatewayOnboardingApproved(event);
       case 'CustomerGatewayOnboardingRejectedEvent':
         return await this.onCustomerGatewayOnboardingRejected(event);
+      case 'CustomerGatewayOnboardingExpiredEvent':
+        return await this.onCustomerGatewayOnboardingExpired(event);
     }
     return false;
   }
@@ -252,8 +261,50 @@ export class CustomerGatewayOnboardingCommandRepository implements IEventHandler
     return await this.repository.delete(event.aggregateId);
   }
 
+  private async onCustomerGatewayOnboardingStarted(event: CustomerGatewayOnboardingStartedEvent) {
+    logger.info('Ready to handle onCustomerGatewayOnboardingStarted event on repository:', event);
+    const payloadInstance = (event as any).payload?.instance;
+    if (payloadInstance) {
+      const projectedEntity = this.repository.create({
+        ...(payloadInstance as any),
+        id: event.aggregateId,
+        type: 'customer-gateway-onboarding'
+      } as Partial<CustomerGatewayOnboarding>);
+      return await this.repository.save(projectedEntity as CustomerGatewayOnboarding);
+    }
+    return true;
+  }
+
+  private async onCustomerGatewayOnboardingApproved(event: CustomerGatewayOnboardingApprovedEvent) {
+    logger.info('Ready to handle onCustomerGatewayOnboardingApproved event on repository:', event);
+    const payloadInstance = (event as any).payload?.instance;
+    if (payloadInstance) {
+      const projectedEntity = this.repository.create({
+        ...(payloadInstance as any),
+        id: event.aggregateId,
+        type: 'customer-gateway-onboarding'
+      } as Partial<CustomerGatewayOnboarding>);
+      return await this.repository.save(projectedEntity as CustomerGatewayOnboarding);
+    }
+    return true;
+  }
+
   private async onCustomerGatewayOnboardingRejected(event: CustomerGatewayOnboardingRejectedEvent) {
     logger.info('Ready to handle onCustomerGatewayOnboardingRejected event on repository:', event);
+    const payloadInstance = (event as any).payload?.instance;
+    if (payloadInstance) {
+      const projectedEntity = this.repository.create({
+        ...(payloadInstance as any),
+        id: event.aggregateId,
+        type: 'customer-gateway-onboarding'
+      } as Partial<CustomerGatewayOnboarding>);
+      return await this.repository.save(projectedEntity as CustomerGatewayOnboarding);
+    }
+    return true;
+  }
+
+  private async onCustomerGatewayOnboardingExpired(event: CustomerGatewayOnboardingExpiredEvent) {
+    logger.info('Ready to handle onCustomerGatewayOnboardingExpired event on repository:', event);
     const payloadInstance = (event as any).payload?.instance;
     if (payloadInstance) {
       const projectedEntity = this.repository.create({

@@ -36,7 +36,10 @@ import {
   CustomerGatewayOnboardingCreatedEvent,
   CustomerGatewayOnboardingUpdatedEvent,
   CustomerGatewayOnboardingDeletedEvent,
+  CustomerGatewayOnboardingStartedEvent,
+  CustomerGatewayOnboardingApprovedEvent,
   CustomerGatewayOnboardingRejectedEvent,
+  CustomerGatewayOnboardingExpiredEvent,
 } from '../events/exporting.event';
 import {
   SagaCustomerGatewayOnboardingFailedEvent
@@ -102,11 +105,44 @@ export class CustomerGatewayOnboardingCrudSaga {
   };
 
   @Saga()
+  onCustomerGatewayOnboardingStarted = ($events: Observable<CustomerGatewayOnboardingStartedEvent>) => {
+    return $events.pipe(
+      ofType(CustomerGatewayOnboardingStartedEvent),
+      tap(event => {
+        this.logger.log(`Saga iniciada para evento de dominio CustomerGatewayOnboardingStarted: ${event.aggregateId}`);
+      }),
+      map(() => null)
+    );
+  };
+
+  @Saga()
+  onCustomerGatewayOnboardingApproved = ($events: Observable<CustomerGatewayOnboardingApprovedEvent>) => {
+    return $events.pipe(
+      ofType(CustomerGatewayOnboardingApprovedEvent),
+      tap(event => {
+        this.logger.log(`Saga iniciada para evento de dominio CustomerGatewayOnboardingApproved: ${event.aggregateId}`);
+      }),
+      map(() => null)
+    );
+  };
+
+  @Saga()
   onCustomerGatewayOnboardingRejected = ($events: Observable<CustomerGatewayOnboardingRejectedEvent>) => {
     return $events.pipe(
       ofType(CustomerGatewayOnboardingRejectedEvent),
       tap(event => {
         this.logger.log(`Saga iniciada para evento de dominio CustomerGatewayOnboardingRejected: ${event.aggregateId}`);
+      }),
+      map(() => null)
+    );
+  };
+
+  @Saga()
+  onCustomerGatewayOnboardingExpired = ($events: Observable<CustomerGatewayOnboardingExpiredEvent>) => {
+    return $events.pipe(
+      ofType(CustomerGatewayOnboardingExpiredEvent),
+      tap(event => {
+        this.logger.log(`Saga iniciada para evento de dominio CustomerGatewayOnboardingExpired: ${event.aggregateId}`);
       }),
       map(() => null)
     );

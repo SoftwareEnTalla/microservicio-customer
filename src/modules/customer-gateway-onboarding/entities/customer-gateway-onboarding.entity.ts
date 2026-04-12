@@ -34,6 +34,7 @@ import { CreateCustomerGatewayOnboardingDto, UpdateCustomerGatewayOnboardingDto,
 import { IsBoolean, IsDate, IsInt, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Field, Float, Int, ObjectType } from "@nestjs/graphql";
+import GraphQLJSON from 'graphql-type-json';
 import { plainToInstance } from 'class-transformer';
 import { Customer } from '../../customer/entities/customer.entity';
 
@@ -204,7 +205,7 @@ export class CustomerGatewayOnboarding extends BaseEntity {
   })
   @IsObject()
   @IsOptional()
-  @Field(() => String, { description: 'Metadatos del onboarding', nullable: true })
+  @Field(() => GraphQLJSON, { description: 'Metadatos del onboarding', nullable: true })
   @Column({ type: 'json', nullable: true, comment: 'Metadatos del onboarding' })
   metadata?: Record<string, any> = {};
 

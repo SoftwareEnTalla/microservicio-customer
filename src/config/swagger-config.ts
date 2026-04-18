@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2026 SoftwarEnTalla
+ * Copyright (c) 2025 SoftwarEnTalla
  * Licencia: MIT
  * Contacto: softwarentalla@gmail.com
  * CEOs: 
@@ -29,8 +29,7 @@
  */
 
 
-import { CustomerModule } from "@modules/customer/modules/customer.module";
-import { CustomerGatewayOnboardingModule } from "@modules/customer-gateway-onboarding/modules/customergatewayonboarding.module";
+import { CodetraceModule } from "@modules/codetrace/modules/codetrace.module";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { logger } from '@core/logs/logger';
 
@@ -39,19 +38,18 @@ import { logger } from '@core/logs/logger';
 export function setupSwagger(
   app,
   apiDoc: string = "api-docs",
-  title: string = "Customer Service API",
-  description: string = "API completa para gestión de Customers con documentación automática",
+  title: string = "Codetrace Service API",
+  description: string = "API completa para gestión de Codetraces con documentación automática",
   version: string = "1.0"
 ): string {
 try{
-  const localPort = String(process.env.PORT || "3000");
       const swaggerConfig = new DocumentBuilder()
         .setTitle(title)
         .setDescription(description)
         .setVersion(version)
         // Organiza por módulos/funcionalidades
         //.addTag("Authentication", "Operaciones de autenticación y usuarios")
-        //.addTag("Customers", "Gestión de transacciones y procesamiento de customers")
+        //.addTag("Codetraces", "Gestión de transacciones y procesamiento de codetraces")
         //.addTag("Subscriptions", "Manejo de suscripciones recurrentes")
         //.addTag("Webhooks", "Endpoints para integraciones externas")
         //.addTag("Reports", "Generación de reportes y analytics")
@@ -70,11 +68,11 @@ try{
         // Servidores (para diferentes entornos)
         .addServer("https://api.production.com", "Production")
         .addServer("https://api.staging.com", "Staging")
-        .addServer("http://localhost:" + localPort, "Local Development")
+        .addServer("http://localhost:3000", "Local Development")
         .build();
 
       const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig, {
-        include: [CustomerModule,         CustomerGatewayOnboardingModule,/*, AuthModule, ReportsModule*/], // Lista todos los módulos
+        include: [CodetraceModule /*, AuthModule, ReportsModule*/], // Lista todos los módulos
         deepScanRoutes: true, // Escanea en profundidad
         ignoreGlobalPrefix: false, // Considera el prefijo global (api/)
         extraModels: [], // Añade esto
@@ -96,7 +94,7 @@ try{
           displayRequestDuration: true,
         },
         customCss: ".swagger-ui .topbar { background-color: #2c3e50; }", // Personalización
-        customSiteTitle: "Customer API Docs",
+        customSiteTitle: "Codetrace API Docs",
         customfavIcon: "/favicon.ico",
       });
   }

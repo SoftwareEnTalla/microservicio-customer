@@ -29,7 +29,8 @@
  */
 
 
-import { CodetraceModule } from "@modules/codetrace/modules/codetrace.module";
+import { CustomerModule } from "@modules/customer/modules/customer.module";
+import { CustomerGatewayOnboardingModule } from "@modules/customer-gateway-onboarding/modules/customergatewayonboarding.module";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { logger } from '@core/logs/logger';
 
@@ -38,18 +39,19 @@ import { logger } from '@core/logs/logger';
 export function setupSwagger(
   app,
   apiDoc: string = "api-docs",
-  title: string = "Codetrace Service API",
-  description: string = "API completa para gestión de Codetraces con documentación automática",
+  title: string = "Customer Service API",
+  description: string = "API completa para gestión de customer con documentación automática",
   version: string = "1.0"
 ): string {
 try{
+  const localPort = String(process.env.PORT || "3000");
       const swaggerConfig = new DocumentBuilder()
         .setTitle(title)
         .setDescription(description)
         .setVersion(version)
         // Organiza por módulos/funcionalidades
         //.addTag("Authentication", "Operaciones de autenticación y usuarios")
-        //.addTag("Codetraces", "Gestión de transacciones y procesamiento de codetraces")
+        //.addTag("Customers", "Gestión de transacciones y procesamiento de customers")
         //.addTag("Subscriptions", "Manejo de suscripciones recurrentes")
         //.addTag("Webhooks", "Endpoints para integraciones externas")
         //.addTag("Reports", "Generación de reportes y analytics")
@@ -68,11 +70,11 @@ try{
         // Servidores (para diferentes entornos)
         .addServer("https://api.production.com", "Production")
         .addServer("https://api.staging.com", "Staging")
-        .addServer("http://localhost:3000", "Local Development")
+        .addServer("http://localhost:" + localPort, "Local Development")
         .build();
 
       const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig, {
-        include: [CodetraceModule /*, AuthModule, ReportsModule*/], // Lista todos los módulos
+        include: [CustomerModule, CustomerGatewayOnboardingModule, /*, AuthModule, ReportsModule*/], // Lista todos los módulos
         deepScanRoutes: true, // Escanea en profundidad
         ignoreGlobalPrefix: false, // Considera el prefijo global (api/)
         extraModels: [], // Añade esto
@@ -94,7 +96,7 @@ try{
           displayRequestDuration: true,
         },
         customCss: ".swagger-ui .topbar { background-color: #2c3e50; }", // Personalización
-        customSiteTitle: "Codetrace API Docs",
+        customSiteTitle: "Customer API Docs",
         customfavIcon: "/favicon.ico",
       });
   }

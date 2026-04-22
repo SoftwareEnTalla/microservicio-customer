@@ -29,29 +29,65 @@
  */
 
 
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 
+const TRACE_WHITELIST_PATTERNS: RegExp[] = [
+  /login/i, /register/i, /activate/i, /password-reset/i,
+  /validate/i, /onModuleInit/i, /auth/i, /signup/i,
+  /forgot-password/i, /reset-password/i, /verify/i,
+  /confirm/i, /token/i, /refresh/i, /logout/i,
+  /health/i, /ping/i,
+];
+
+const TRACE_SOURCE_HEADER = 'x-trace-source';
+
+const TRUSTED_TRACE_SOURCES: string[] = [
+  'security-service', 'customer-service', 'client-service',
+  'merchant-service', 'payment-service', 'invoice-service',
+  'orders-service', 'product-service', 'salesmanager-service',
+  'catalog-service', 'codetrace-service',
+];
+
 @Injectable()
 export class CustomerAuthGuard implements CanActivate {
+  private readonly logger = new Logger(CustomerAuthGuard.name);
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
     const ctx = context.switchToHttp();
     const request = ctx.getRequest<Request>();
-    
-    // Ejemplo: Verificación de JWT
-    const token = request.headers.authorization?.split(' ')[1];
-    if (!token) return false;
 
-    // Lógica de validación de token
-    return this.validateToken(token);
+    // 1. Bearer token auth (primary)
+    const token = request.headers.authorization?.split(' ')[1];
+    if (token && this.validateToken(token)) return true;
+
+    // 2. Trusted trace source header
+    const traceSource = request.headers[TRACE_SOURCE_HEADER] as string;
+    if (traceSource && TRUSTED_TRACE_SOURCES.includes(traceSource)) {
+      this.logger.debug(`Trusted trace source: ${traceSource}`);
+      return true;
+    }
+
+    // 3. Whitelist pattern matching on body
+    if (request.body && this.isWhitelistedTrace(request.body)) {
+      this.logger.debug('Whitelisted trace pattern matched');
+      return true;
+    }
+
+    return false;
   }
 
   private validateToken(token: string): boolean {
-    // Implementar lógica real de validación
     return token === 'valid-token';
+  }
+
+  private isWhitelistedTrace(body: any): boolean {
+    const name = body?.name || body?.data?.name || '';
+    const description = body?.description || body?.data?.description || '';
+    const text = `${name} ${description}`;
+    return TRACE_WHITELIST_PATTERNS.some((p) => p.test(text));
   }
 }

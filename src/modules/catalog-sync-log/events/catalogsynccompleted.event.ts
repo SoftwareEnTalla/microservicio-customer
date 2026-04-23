@@ -29,38 +29,35 @@
  */
 
 
-import { IEvent } from '@nestjs/cqrs';
 
-export interface EventMetadata {
-  initiatedBy: string;
-  correlationId: string;
-  causationId?: string;
-  eventId?: string;
-  eventName?: string;
-  eventVersion?: string;
-  sourceService?: string;
-  traceId?: string;
-  retryCount?: number;
-  occurredOn?: string;
-  idempotencyKey?: string;
-  originalTopic?: string;
-  [key: string]: any;
-}
+import { CatalogSyncLog } from '../entities/catalog-sync-log.entity';
+import { BaseEvent, PayloadEvent } from './base.event'; 
+import { v4 as uuidv4 } from "uuid";
 
-export abstract class BaseEvent implements IEvent {
-  //Constructor de BaseEvent
+export class CatalogSyncCompletedEvent extends BaseEvent {
   constructor(
     public readonly aggregateId: string,
-    public readonly timestamp: Date = new Date()
+    public readonly payload: PayloadEvent<any|CatalogSyncLog>
   ) {
-    //Aquí coloca implementación escencial no más de BaseEvent
+    super(aggregateId);
   }
-}
-export abstract class BaseFailedEvent implements IEvent {
-  constructor(public readonly error:Error,public readonly event:any) {}
-}
 
-export interface PayloadEvent<T = any> {
-  instance: T;
-  metadata: EventMetadata;
+  
+         // Método estático para construcción consistente del evento
+        static create(
+          instanceId: string,
+          instance: any|CatalogSyncLog,
+          userId: string,
+          correlationId?: string
+        ): CatalogSyncCompletedEvent {
+          return new CatalogSyncCompletedEvent(instanceId, {
+            instance: instance,
+            metadata: {
+              initiatedBy: userId,
+              correlationId:correlationId || uuidv4(),
+            },
+          });
+        }
+        
+
 }

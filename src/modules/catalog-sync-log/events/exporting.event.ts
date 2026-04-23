@@ -30,7 +30,8 @@
 export * from "./catalogsynclogdeleted.event"; 
 export * from "./catalogsynclogcreated.event";
 export * from "./catalogsynclogupdated.event";
-
+export * from "./catalogsynccompleted.event";
+export * from "./catalogsyncfailed.event";
 export * from "./event-registry";
 export * from "./base.event";
 export * from "./catalogsynclog-failed.event";

@@ -55,6 +55,8 @@ import { CustomerGatewayOnboardingModule } from "./modules/customer-gateway-onbo
 import { CustomerGatewayOnboardingCommandService } from "./modules/customer-gateway-onboarding/services/customergatewayonboardingcommand.service";
 import { CustomerGatewayOnboardingQueryService } from "./modules/customer-gateway-onboarding/services/customergatewayonboardingquery.service";
 
+import { CatalogClientModule } from "./modules/catalog-client/catalog-client.module";
+
 /*
 //TODO unused for while dependencies
 import { I18nModule } from "nestjs-i18n";
@@ -122,6 +124,7 @@ import LoggerService, { logger } from "@core/logs/logger";
     /**
      * Módulo Logger de la aplicación
      */
+    CatalogClientModule,
     LoggingModule,
 
     // GraphQL solo si GRAPHQL_ENABLED=true

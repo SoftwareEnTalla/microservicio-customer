@@ -30,13 +30,11 @@
 
 
 import { Module } from "@nestjs/common";
-import { CustomerGatewayOnboardingCommandController } from "../controllers/customergatewayonboardingcommand.controller";
 import { CustomerGatewayOnboardingLoggingInterceptor } from "../interceptors/customergatewayonboarding.logging.interceptor";
 import { CommandBus, EventBus, UnhandledExceptionBus } from "@nestjs/cqrs";
 import { CustomerGatewayOnboardingAuthGuard } from "../guards/customergatewayonboardingauthguard.guard";
 
 @Module({
-  controllers: [CustomerGatewayOnboardingCommandController],
   providers: [
     CustomerGatewayOnboardingAuthGuard,
     CustomerGatewayOnboardingLoggingInterceptor,

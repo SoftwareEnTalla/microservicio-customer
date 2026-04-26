@@ -70,6 +70,10 @@ import LoggerService, { logger } from "@core/logs/logger";
 
 */
 
+import { HorizontalModule } from "@common/horizontal";
+
+import { NomencladorListenersModule } from './modules/nomenclador-listeners/nomenclador-listeners.module';
+import { CustomerOnboardingStatusModule } from "./modules/customer-onboarding-status/modules/customeronboardingstatus.module";
 @Module({
   imports: [
     // Se importa/registra el módulo de caché
@@ -118,6 +122,7 @@ import LoggerService, { logger } from "@core/logs/logger";
      * Módulos Customer de la aplicación
      */
     CqrsModule,
+    HorizontalModule,
     CustomerModule,
         CatalogSyncLogModule,
     CustomerGatewayOnboardingModule,    
@@ -140,6 +145,9 @@ import LoggerService, { logger } from "@core/logs/logger";
           }),
         ]
       : []),
+  
+    NomencladorListenersModule,
+      CustomerOnboardingStatusModule,
   ],
 
   /**

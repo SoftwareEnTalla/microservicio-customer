@@ -1,0 +1,2 @@
+postgres-1-catalog-sync-log.sql
+postgres-2-customer-onboarding-status.sql

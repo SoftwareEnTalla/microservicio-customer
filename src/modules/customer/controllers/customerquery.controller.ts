@@ -337,6 +337,41 @@ export class CustomerQueryController {
       return Helper.throwCachedError(error);
     }
   }
+
+  @Get(':id/referral-tree')
+  @ApiOperation({ summary: 'Read model nativo del referral tree para un customer' })
+  @ApiParam({ name: 'id', required: true, description: 'ID del customer raíz', type: String })
+  @ApiQuery({ name: 'maxDepth', required: false, type: Number })
+  async getReferralTreeReadModel(
+    @Param('id') id: string,
+    @Query('maxDepth') maxDepth?: string,
+  ): Promise<Record<string, unknown>> {
+    try {
+      return await this.service.getReferralTreeReadModel(id, Number(maxDepth || 5));
+    } catch (error) {
+      logger.error(error);
+      return Helper.throwCachedError(error);
+    }
+  }
+
+  @Get(':id/earnings-summary')
+  @ApiOperation({ summary: 'Earnings summary local del referral tree para un customer' })
+  @ApiParam({ name: 'id', required: true, description: 'ID del customer raíz', type: String })
+  @ApiQuery({ name: 'maxDepth', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  async getReferralEarningsSummary(
+    @Param('id') id: string,
+    @Query('maxDepth') maxDepth?: string,
+    @Query('limit') limit?: string,
+  ): Promise<Record<string, unknown>> {
+    try {
+      return await this.service.getReferralEarningsSummary(id, Number(maxDepth || 5), Number(limit || 8));
+    } catch (error) {
+      logger.error(error);
+      return Helper.throwCachedError(error);
+    }
+  }
+
   @Get(":id")
   @ApiOperation({ summary: "Get customer by ID" })
   @ApiResponse({ status: 200, type: CustomerResponse<Customer> })

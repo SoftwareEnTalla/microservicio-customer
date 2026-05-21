@@ -11,6 +11,11 @@ export interface HttpLoggerApiRest {
   headers?: Record<string, string>;
   body: {
     layer?: string;
+    layerType?: string;
+    severity?: string;
+    functionalKind?: string;
+    description?: string;
+    sourceService?: string;
     uuid?: string;
     refuuid?: string;
     className?: string;
@@ -29,6 +34,9 @@ export interface HttpLoggerApiRest {
 
 export interface LogExecutionTimeOptions {
   layer?: string;
+  severity?: string;
+  functionalKind?: string;
+  description?: string;
   refuuid?: string;
   timeFormat?: "s" | "ms" | "m";
   client: ILoggerClient | undefined;
